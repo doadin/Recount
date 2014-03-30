@@ -51,6 +51,7 @@ zonefilters.lua
 debug.lua
 
 GUI_Main.lua
+GUI_Secondary.lua
 GUI_Detail.lua
 GUI_DeathGraph.lua
 GUI_Graph.lua

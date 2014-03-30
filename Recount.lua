@@ -326,6 +326,8 @@ local Default_Profile={
 		SegmentBosses=false,
 		MainWindowVis=true,
 		MainWindowMode=1,
+		SecondaryWindowVis=false,
+		SecondaryWindowMode=1,
 		Locked=false,
 		EnableSync=true, -- Elsia: Default enable sync is set to true again now, thanks to lazy syncing.
 		GlobalDataCollect=true, -- Elsia: Global toggle for data collection
@@ -333,6 +335,35 @@ local Default_Profile={
 		Font="Arial Narrow",
 		Scaling=1,
 		MainWindow={
+			Buttons={
+				ReportButton=true,
+				FileButton=true,
+				ConfigButton=true,
+				ResetButton=true,
+				LeftButton=true,
+				RightButton=true,
+				CloseButton=true,
+			},
+			RowHeight=14,
+			RowSpacing=1,
+			AutoHide=false,
+			ShowScrollbar=true, -- Elsia: Allow toggle of scrollbar
+			HideTotalBar=true,
+			BarText=
+			{
+				RankNum =true,
+				PerSec = true,
+				Percent = true,
+				NumFormat = 1,
+			},
+			Position={
+				x = 0,
+				y = 0,
+				w = 140,
+				h = 200,
+			},
+		},
+		SecondaryWindow={
 			Buttons={
 				ReportButton=true,
 				FileButton=true,
@@ -467,11 +498,15 @@ BINDING_NAME_RECOUNT_RAGE = L["Display"].." "..L["Rage Gained"]
 BINDING_NAME_RECOUNT_RUNICPOWER = L["Display"].." "..L["Runic Power Gained"]
 
 BINDING_NAME_RECOUNT_REPORT_MAIN = L["Report the Main Window Data"]
+BINDING_NAME_RECOUNT_REPORT_SECONDARY = L["Report the Secondary Window Data"]
 BINDING_NAME_RECOUNT_REPORT_DETAILS = L["Report the Detail Window Data"]
 BINDING_NAME_RECOUNT_RESET_DATA = L["Resets the data"]
 BINDING_NAME_RECOUNT_SHOW_MAIN = L["Shows the main window"]
 BINDING_NAME_RECOUNT_HIDE_MAIN = L["Hides the main window"]
+BINDING_NAME_RECOUNT_SHOW_SECONDARY = L["Shows the secondary window"]
+BINDING_NAME_RECOUNT_HIDE_SECONDARY = L["Hides the secondary window"]
 BINDING_NAME_RECOUNT_TOGGLE_MAIN = L["Toggles the main window"]
+BINDING_NAME_RECOUNT_TOGGLE_SECONDARY = L["Toggles the secondary window"]
 BINDING_NAME_RECOUNT_TOGGLE_PAUSE = L["Toggle pause of global data collection"]
 
 local optFrame
@@ -574,6 +609,14 @@ Recount.consoleOptions = {
 			func = function() Recount.MainWindow:Show();Recount:RefreshMainWindow() end,
 			dialogHidden = true
 		},
+		[L["show2"]] = {
+			order = 12,
+			name = L["Show2"],
+			desc = L["Shows the secondary window"],
+			type = 'execute',
+			func = function() Recount.SecondaryWindow:Show();Recount:RefreshSecondaryWindow() end,
+			dialogHidden = true
+		},
 		[L["pause"]] = {
 			order = 23,
 			name = L["Pause"],
@@ -595,12 +638,27 @@ Recount.consoleOptions = {
 			func = function() Recount.MainWindow:Hide() end,
 			dialogHidden = true
 		},
+		hide2 = {
+			order = 13,
+			name = L["Hide2"],
+			desc = L["Hides the secondary window"],
+			type = 'execute',
+			func = function() Recount.SecondaryWindow:Hide() end,
+			dialogHidden = true
+		},
 		toggle = {
 			order = 11,
 			name = L["Toggle"],
 			desc = L["Toggles the main window"],
 			type = 'execute',
 			func = function() if Recount.MainWindow:IsShown() then Recount.MainWindow:Hide() else Recount.MainWindow:Show();Recount:RefreshMainWindow() end end
+		},
+		toggle2 = {
+			order = 11,
+			name = L["Toggle2"],
+			desc = L["Toggles the secondary window"],
+			type = 'execute',
+			func = function() if Recount.SecondaryWindow:IsShown() then Recount.SecondaryWindow:Hide() else Recount.SecondaryWindow:Show();Recount:RefreshSecondaryWindow() end end
 		},
 		config = {
 			order = 3,
@@ -727,6 +785,29 @@ Recount.consoleOptions2.args.report = {
 					set = function(info, value)
 						if string_lower(value) == "gui" then
 							Recount:ShowReport("Main",Recount.ReportData)
+						else
+							Recount.db.profile.ReportLines = Recount.db.profile.ReportLines or 10
+							Recount:ReportData(Recount.db.profile.ReportLines,string_lower(value),"")
+						end
+					end,
+				},
+				secondary = {
+					type = "select",
+					name = L["Secondary"],
+					order = 1,
+					desc = L["Report the Secondary Window Data"],
+					values = {
+						["Say"] = "Say",
+						["Party"] = "Party",
+						["Raid"] = "Raid",
+						["Guild"] = "Guild",
+						["Officer"] = "Officer",
+						["Gui"] = "GUI",
+					},
+					get = function(info) return "Select" end,
+					set = function(info, value)
+						if string_lower(value) == "gui" then
+							Recount:ShowReport("Secondary",Recount.ReportData)
 						else
 							Recount.db.profile.ReportLines = Recount.db.profile.ReportLines or 10
 							Recount:ReportData(Recount.db.profile.ReportLines,string_lower(value),"")
@@ -889,6 +970,14 @@ function Recount:ResetDataUnsafe()
 
 	if Recount.MainWindow then
 		Recount:RefreshMainWindow()
+	end
+	if Recount.SecondaryWindow and Recount.SecondaryWindow.DispTableSorted then
+		Recount.SecondaryWindow.DispTableSorted=Recount:GetTable()
+		Recount.SecondaryWindow.DispTableLookup=Recount:GetTable()
+	end
+
+	if Recount.SecondaryWindow then
+		Recount:RefreshSecondaryWindow()
 	end
 
 	if #Recount.db2.FoughtWho > 0 then
@@ -1765,8 +1854,10 @@ function Recount:TimeTick()
 	   if gotdeleted then
 	      Recount:SetMainWindowMode(Recount.db.profile.MainWindowMode)
 	      Recount:FullRefreshMainWindow()
+		  Recount:SetSecondaryWindowMode(Recount.db.profile.SecondaryWindowMode)
+	      Recount:FullRefreshSecondaryWindow()
 	   end
-
+	   
 	   if Recount.db.profile.AutoDelete and math_fmod(Time,10)==0 then
 	      Recount:DeleteOldTimeData(Time)
 	   end
@@ -1783,6 +1874,7 @@ function Recount:PutInCombat()
 
 	if Recount.db.profile.MainWindow.AutoHide then
 		Recount.MainWindow:Hide()
+		Recount.SecondaryWindow:Hide()
 	end
 
 	if Recount.db.profile.CurDataSet=="LastFightData" then
@@ -1794,6 +1886,8 @@ function Recount:PutInCombat()
 	if Recount.db.profile.CurDataSet=="CurrentFightData" then -- Elsia: Fix for double entry in CurAndLast mode
 		Recount.MainWindow.DispTableSorted=Recount:GetTable()
 		Recount.MainWindow.DispTableLookup=Recount:GetTable()
+		Recount.SecondaryWindow.DispTableSorted=Recount:GetTable()
+		Recount.SecondaryWindow.DispTableLookup=Recount:GetTable()
 	end
 	
 	if RecountDeathTrack then
@@ -1819,6 +1913,8 @@ function Recount:LeaveCombat(Time)
 	if Recount.db.profile.MainWindow.AutoHide then
 		Recount.RefreshMainWindow()
 		Recount.MainWindow:Show()
+		Recount.RefreshSecondaryWindow()
+		Recount.SecondaryWindow:Show()
 	end
 
 	--Did we actually fight someone?
@@ -1846,6 +1942,8 @@ function Recount:LeaveCombat(Time)
 		if Recount.db.profile.CurDataSet~="OverallData" then
 			Recount.MainWindow.DispTableSorted=Recount:GetTable()
 			Recount.MainWindow.DispTableLookup=Recount:GetTable()
+			Recount.SecondaryWindow.DispTableSorted=Recount:GetTable()
+			Recount.SecondaryWindow.DispTableLookup=Recount:GetTable()
 		end
 
 		Recount.db2.FightNum=Recount.db2.FightNum+1
@@ -1886,11 +1984,15 @@ end
 
 function Recount:DelayedResizeWindows()
 	Recount:ResizeMainWindow()
+	Recount:ResizeSecondaryWindow()
 	--DelayedResizeWindows=nil
 end
 
 function Recount:HandleProfileChanges()
 	if not Recount.MainWindow then
+		return
+	end
+	if not Recount.SecondaryWindow then
 		return
 	end
 
@@ -1899,6 +2001,10 @@ function Recount:HandleProfileChanges()
 	Recount:ResizeMainWindow()
 	Recount:FullRefreshMainWindow()
 	Recount:SetupMainWindowButtons()
+	Recount:RestoreSecondaryWindowPosition(Recount.db.profile.SecondaryWindow.Position.x,Recount.db.profile.SecondaryWindow.Position.y,Recount.db.profile.SecondaryWindow.Position.w,Recount.db.profile.SecondaryWindow.Position.h)
+	Recount:ResizeSecondaryWindow()
+	Recount:FullRefreshSecondaryWindow()
+	Recount:SetupSecondaryWindowButtons()
 
 	if Recount.db.profile.GraphWindow then
 		Recount.GraphWindow:ClearAllPoints()
@@ -1995,13 +2101,15 @@ function Recount:OnInitialize()
 	Recount.CurrentDataCollect = true
 	
 	Recount:CreateMainWindow()
-
+	Recount:CreateSecondaryWindow()
+	
 	Recount:CreateDetailWindow()
 	Recount:CreateGraphWindow()
 	Recount:CreateFilterWeights()
 	Recount:InitOrder()
 
 	Recount:SetupMainWindow()
+	Recount:SetupSecondaryWindow()
 	Recount:ScheduleTimer("DelayedResizeWindows",0.1)
 
 	SM.RegisterCallback(Recount, "LibSharedMedia_Registered", "UpdateBarTextures")

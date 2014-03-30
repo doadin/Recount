@@ -29,6 +29,7 @@ function Recount:InitOrder()
 	TopWindow=nil
 	
 	Recount:AddWindow(Recount.MainWindow)
+	Recount:AddWindow(Recount.SecondaryWindow)
 	Recount:AddWindow(Recount.DetailWindow)
 	Recount:AddWindow(Recount.GraphWindow)
 end
