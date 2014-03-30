@@ -628,6 +628,20 @@ local MainWindowModes={
 {L["HOT Uptime"],DataModes.HOTReturner,TooltipFuncs.HOTs,nil,nil,nil,nil},
 {L["Activity"],DataModes.ActiveTime,TooltipFuncs.ActiveTime,nil,nil,nil,nil},
 }
+local SecondaryWindowModes={
+{L["Damage Done"],DataModes.DamageReturner,TooltipFuncs.Damage,nil,{"DAMAGE",L["'s DPS"]},nil,"Damage"},
+{L["DPS"],DataModes.DPSReturner,TooltipFuncs.Damage,nil,{"DAMAGE",L["'s DPS"]},nil,"Damage"},
+{L["Friendly Fire"],DataModes.FriendlyDamageReturner,TooltipFuncs.FDamage},
+{L["Damage Taken"],DataModes.DamageTakenReturner,TooltipFuncs.DamageTaken,nil,{"DAMAGETAKEN",L["'s DTPS"]},nil,"DamageTaken"},
+{L["Healing Done"],DataModes.HealingReturner,TooltipFuncs.Healing,nil,{"HEALING",L["'s HPS"]},nil,"Healing"},
+{L["Absorbs"],DataModes.Absorbs, TooltipFuncs.Absorbs,nil,nil,nil,nil},
+{L["Healing Taken"],DataModes.HealingTaken,TooltipFuncs.HealingTaken,nil,{"HEALINGTAKEN",L["'s HTPS"]},nil,"HealingTaken"},
+{L["Overhealing Done"],DataModes.OverhealingReturner,TooltipFuncs.Overhealing},
+{L["Deaths"],DataModes.DeathReturner,TooltipFuncs.DeathCounts},
+{L["DOT Uptime"],DataModes.DOTReturner,TooltipFuncs.DOTs,nil,nil,nil,nil},
+{L["HOT Uptime"],DataModes.HOTReturner,TooltipFuncs.HOTs,nil,nil,nil,nil},
+{L["Activity"],DataModes.ActiveTime,TooltipFuncs.ActiveTime,nil,nil,nil,nil},
+}
 
 function Recount:AddModeTooltip(lname,modefunc,toolfunc,...)
 	tinsert(MainWindowModes,{lname,modefunc,toolfunc,...})

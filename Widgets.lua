@@ -22,6 +22,10 @@ function Recount:CreateFrame(Name, Title, Height, Width, ShowFunc, HideFunc)
 		Recount.Colors:RegisterBorder("Window","Title",theFrame)
 		Recount.Colors:RegisterBackground("Window","Background",theFrame)
 	else
+	if Name == "Recount_SecondaryWindow" then
+		Recount.Colors:RegisterBorder("Window","Title",theFrame)
+		Recount.Colors:RegisterBackground("Window","Background",theFrame)
+	else
 		Recount.Colors:RegisterBorder("Other Windows","Title",theFrame)
 		Recount.Colors:RegisterBackground("Other Windows","Background",theFrame)
 	end
@@ -79,6 +83,10 @@ function Recount:CreateFrame(Name, Title, Height, Width, ShowFunc, HideFunc)
 		Recount.Colors:UnregisterItem(theFrame.Title)
 		Recount.Colors:RegisterFont("Other Windows","Title Text",theFrame.Title)
 	end
+	if Name == "Recount_SecondaryWindow" then
+		Recount.Colors:UnregisterItem(theFrame.Title)
+		Recount.Colors:RegisterFont("Window","Title Text",theFrame.Title)
+	else
 	
 	theFrame.CloseButton=CreateFrame("Button",nil,theFrame)
 	theFrame.CloseButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up.blp")

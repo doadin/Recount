@@ -1,0 +1,25 @@
+done
+
+GUI_Main
+GUI_Secondary ?
+Recount
+Recount_Modes
+WindowOrder
+Widgets
+zonefilters
+
+todo
+
+Bindings
+colors
+debug
+deletion
+embeds
+Fights
+Fonts
+GUI_Config
+GUI_Report
+GUI_Detail
+GUI_Graph
+
+Rest dont need changes as far as i know now...that could change later

@@ -14,11 +14,14 @@ function Recount:SetZoneFilter(instanceType)
 		if Recount.db.profile.HideCollect and not Recount.CurrentDataCollect and Recount.db.profile.GlobalDataCollect then
 			Recount.MainWindow:Show()
 			Recount:RefreshMainWindow()
+			Recount.SecondaryWindow:Show()
+			Recount:RefreshSecondaryWindow()
 		end
 		Recount.CurrentDataCollect = true
 	else
 		if Recount.db.profile.HideCollect and (Recount.CurrentDataCollect or not Recount.db.profile.GlobalDataCollect) then
 			Recount.MainWindow:Hide()
+			Recount.SecondaryWindow:Hide()
 		end
 		Recount.CurrentDataCollect = false
 	end
@@ -34,11 +37,14 @@ function Recount:SetGroupFilter(groupType)
 		if Recount.db.profile.HideCollect and not Recount.CurrentDataCollect and Recount.db.profile.GlobalDataCollect then
 			Recount.MainWindow:Show()
 			Recount:RefreshMainWindow()
+			Recount.SecondaryWindow:Show()
+			Recount:RefreshSecondaryWindow()
 		end
 		Recount.CurrentDataCollect = true
 	else
 		if Recount.db.profile.HideCollect and (Recount.CurrentDataCollect or not Recount.db.profile.GlobalDataCollect) then
 			Recount.MainWindow:Hide()
+			Recount.SecondaryWindow:Hide()
 		end
 		Recount.CurrentDataCollect = false
 	 end
@@ -52,14 +58,17 @@ function Recount:SetZoneGroupFilter(instanceType,groupType)
 	if not instanceType or not groupType then return end
 	
 	if Recount.db.profile.ZoneFilters[instanceType] and Recount.db.profile.GroupFilters[groupType] then
-		if Recount.db.profile.HideCollect and not Recount.MainWindow:IsShown() and Recount.db.profile.GlobalDataCollect then
+		if Recount.db.profile.HideCollect and not Recount.MainWindow:IsShown() and not Recount.SecondaryWindow:IsShown() and Recount.db.profile.GlobalDataCollect then
 			Recount.MainWindow:Show()
 			Recount:RefreshMainWindow()
+			Recount.SecondaryWindow:Show()
+			Recount:RefreshSecondaryWindow()
 		end
 		Recount.CurrentDataCollect = true
 	else
-		if Recount.db.profile.HideCollect and Recount.MainWindow:IsShown() or not Recount.db.profile.GlobalDataCollect then
+		if Recount.db.profile.HideCollect and Recount.MainWindow:IsShown() and Recount.SecondaryWindow:IsShown() or not Recount.db.profile.GlobalDataCollect then
 			Recount.MainWindow:Hide()
+			Recount.SecondaryWindow:Hide()
 		end
 		Recount.CurrentDataCollect = false
 	end
